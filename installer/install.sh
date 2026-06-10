@@ -84,12 +84,22 @@ install_dependencies() {
 
     apt-get update
 
+    # Chromium package name varies by OS (Bookworm: chromium-browser, Trixie: chromium)
+    if apt-cache show chromium-browser &>/dev/null; then
+        CHROMIUM_PKG=chromium-browser
+    elif apt-cache show chromium &>/dev/null; then
+        CHROMIUM_PKG=chromium
+    else
+        error "Chromium package not found (tried chromium-browser and chromium)"
+    fi
+    log "Using browser package: $CHROMIUM_PKG"
+
     # Core dependencies
     apt-get install -y \
         python3 \
         python3-pip \
         python3-venv \
-        chromium-browser \
+        "$CHROMIUM_PKG" \
         pulseaudio \
         v4l-utils \
         libcamera-apps \
@@ -163,7 +173,7 @@ install_croom() {
         # If package not on PyPI, install from source
         log "Installing from source..."
         "$INSTALL_DIR/venv/bin/pip" install /usr/local/src/croom 2>/dev/null || \
-        "$INSTALL_DIR/venv/bin/pip" install git+https://github.com/your-org/croom.git
+        "$INSTALL_DIR/venv/bin/pip" install git+https://github.com/amirhmoradi/croom.to.git
     }
 
     # Install browser automation
